@@ -11,7 +11,7 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const crypto = require("node:crypto");
-const { DatabaseSync } = require("node:sqlite");
+const Database = require("better-sqlite3"); // portable native SQLite — runs on any Node 18+ / any host
 
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.SAM_SECRET || "dev-secret-change-me";
@@ -19,7 +19,7 @@ const SITE = process.env.SITE_FILE || path.join(__dirname, "index.html");
 
 // ---------- database ----------
 const DB_FILE = process.env.SAM_DB || path.join(__dirname, "sam.db"); // override to relocate the database (e.g. a mounted persistent disk)
-const db = new DatabaseSync(DB_FILE);
+const db = new Database(DB_FILE);
 db.exec(`
   CREATE TABLE IF NOT EXISTS patients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
