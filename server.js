@@ -180,8 +180,8 @@ const CORS_ORIGINS = (process.env.SAM_CORS ||
   "https://www.samhealthcare.in,https://samhealthcare.in,https://www.samhealthcare.co.in,https://samhealthcare.co.in")
   .split(",").map(s => s.trim()).filter(Boolean);
 
-// ---------- server ----------
-http.createServer(async (req, res) => {
+// ---------- request handler ----------
+const requestHandler = async (req, res) => {
   const url = new URL(req.url, "http://x");
 
   // CORS: allow the SAM front-end domains to call this API
@@ -443,4 +443,19 @@ http.createServer(async (req, res) => {
     return fs.createReadStream(SITE).pipe(res);
   }
   json(res, 404, { error: "Not found" });
-}).listen(PORT, () => console.log(`SAM Platform Starter → http://localhost:${PORT}\nDemo clinician: dr.demo@samhealthcare.in / SamDemo123`));
+};
+
+// ---------- server: Express when available (Hostinger-friendly), else node:http ----------
+const banner = kind => console.log(`SAM Platform Starter (${kind}) → http://localhost:${PORT}\nDemo clinician: dr.demo@samhealthcare.in / SamDemo123`);
+let listening = false;
+try {
+  const express = require("express");
+  const app = express();
+  app.disable("x-powered-by");
+  app.use((req, res) => requestHandler(req, res)); // delegate everything to our handler (reads raw body itself)
+  app.listen(PORT, () => { banner("express"); });
+  listening = true;
+} catch (e) {
+  console.log("[express not available, falling back to node:http]", e.message);
+}
+if (!listening) http.createServer(requestHandler).listen(PORT, () => banner("node:http"));

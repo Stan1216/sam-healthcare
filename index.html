@@ -1730,8 +1730,7 @@ if (!reduced) addEventListener('scroll', () => {
 })();
 
 // ===== API base: same-origin on Render/local; Render backend when served from Hostinger/custom domain =====
-const SAM_API = (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname.endsWith('.onrender.com'))
-  ? '' : 'https://sam-healthcare.onrender.com';
+const SAM_API = ''; // same-origin: the Node backend serves both the pages and the API on one host
 
 // login modal + account (demo mode + real API when served by Platform Starter)
 (() => {
@@ -1910,9 +1909,9 @@ document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.ad
     return A("I can explain reports, decode prescriptions and point you to the right care — always with sources, never replacing your doctor. Tell me what's worrying you — a symptom, a body part, a report — or ask about physiotherapy, elder care or our services. For anything urgent, call <b>108</b>.", ['Dr. Sharen operating charter: informs & references; every clinical decision is clinician-confirmed'], null);
   };
 
-  const bubble = (cls, html) => { const d = document.createElement('div'); d.className = 'cb ' + cls; d.innerHTML = html;
+  const bubble = (cls, html, noScroll) => { const d = document.createElement('div'); d.className = 'cb ' + cls; d.innerHTML = html;
     thread.appendChild(d); requestAnimationFrame(() => requestAnimationFrame(() => d.classList.add('on')));
-    d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return d; };
+    if (!noScroll) d.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); return d; };
   const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const actions = {
     book_physio: '<span class="step"><a href="#book" style="color:inherit">Book a physio assessment →</a></span>',
@@ -1946,6 +1945,15 @@ document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.ad
   };
   send.addEventListener('click', ask);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') ask(); });
+
+  // Dr. Sharen greets the moment the page is ready — no auto-scroll, so the visitor still lands on the hero
+  (function greet(){
+    if (thread.children.length) return;                       // never double-greet
+    const ty = bubble('bot typing', '<i></i><i></i><i></i>', true);
+    setTimeout(() => { ty.remove();
+      bubble('bot', "Namaste 🙏 I'm <b>Dr. Sharen</b>, SAM Healthcare's clinical companion. Tell me what's worrying you — a symptom, a report or prescription, recovery after surgery, or care for your parents — and I'll guide you to the right care, always with sources. I never replace your treating doctor, and for anything urgent it's always <b>108</b> first. What's on your mind today?", true);
+    }, 800);
+  })();
 })();
 
 // ===== WhatsApp chat widget (2-step: who you are → what you need) =====
