@@ -675,6 +675,20 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
 .waw-note{margin:9px 0 0;font-size:11px;color:var(--grey);text-align:center}
 @media(max-width:880px){.wa-widget{bottom:180px}}
 @media (prefers-reduced-motion:reduce){.wa-widget{transition:none}}
+/* ===== SAM ID nudge (persistent until registered) ===== */
+.id-nudge{position:fixed;left:20px;bottom:20px;z-index:94;width:min(330px,calc(100vw - 40px));background:var(--white);border:1px solid rgba(0,64,80,.1);border-left:4px solid #78C088;border-radius:16px;box-shadow:0 20px 50px rgba(0,32,40,.25);padding:16px 18px;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .35s cubic-bezier(.2,.65,.3,1),transform .35s cubic-bezier(.2,.65,.3,1)}
+.id-nudge.show{opacity:1;transform:none;pointer-events:auto}
+.id-nudge b{display:block;font-size:14px;color:var(--teal-deep);margin-bottom:4px}
+.id-nudge p{font-size:12.5px;color:var(--grey);line-height:1.5;margin:0 0 11px}
+.id-nudge .row{display:flex;gap:9px;align-items:center}
+.id-nudge .go-btn{flex:1;text-align:center;padding:10px 14px;border:none;border-radius:100px;background:var(--grad);color:#fff;font-family:inherit;font-size:13px;font-weight:800;cursor:pointer;transition:transform .2s}
+.id-nudge .go-btn:hover{transform:translateY(-1px)}
+.id-nudge .later{background:none;border:none;font-family:inherit;font-size:12px;font-weight:700;color:var(--grey);cursor:pointer;padding:8px}
+.id-nudge .nx{position:absolute;top:8px;right:12px;background:none;border:none;font-size:18px;color:var(--grey);cursor:pointer;line-height:1}
+@media(max-width:880px){.id-nudge{bottom:86px}}
+.cb.signup-chip{align-self:flex-start;background:linear-gradient(120deg,rgba(56,168,216,.1),rgba(184,216,56,.12));border:1px dashed rgba(0,64,80,.25);cursor:pointer}
+.cb.signup-chip:hover{border-style:solid}
+#lp-context{display:none;background:var(--aqua);border-radius:10px;padding:9px 12px;font-size:12.5px;color:var(--teal-deep);font-weight:600}
 </style>
 </head>
 <body>
@@ -1481,6 +1495,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
       <button data-pane="pro">For Care Professionals</button>
     </div>
     <div class="m-pane on" id="pane-patient">
+      <p id="lp-context"></p>
       <div><label for="lp-name">Your name</label><input id="lp-name" placeholder="e.g., Lakshmi Devarakonda"></div>
       <div><label for="lp-phone">Mobile number</label><input id="lp-phone" type="tel" placeholder="98XXXXXXXX"></div>
       <div id="otpRow" style="display:none"><label for="lp-otp">OTP (sent on WhatsApp/SMS)</label><input id="lp-otp" inputmode="numeric" maxlength="4" placeholder="• • • •"></div>
@@ -1508,6 +1523,17 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
       <button class="btn btn-outline" id="acctSignout" style="justify-content:center;width:100%;margin-top:14px;padding:12px">Sign out</button>
     </div>
     <p class="m-note" style="margin-top:14px;border-top:1px dashed rgba(0,64,80,.15);padding-top:10px">Prototype: works in demo mode in this file. With the included Platform Starter backend running, OTPs, accounts and bookings are stored in a real database.</p>
+  </div>
+</div>
+
+<!-- SAM ID nudge -->
+<div class="id-nudge" id="idNudge" role="dialog" aria-label="Create your SAM Health ID">
+  <button class="nx" id="nudgeX" aria-label="Close">×</button>
+  <b>Your family's care file starts here</b>
+  <p>Create your free <b style="display:inline;font-size:12.5px">SAM Health ID</b> in 30 seconds — phone + OTP. Every report, booking and visit note stays under one ID, ready for any clinician you see.</p>
+  <div class="row">
+    <button class="go-btn" id="nudgeGo">Create my SAM ID</button>
+    <button class="later" id="nudgeLater">Later</button>
   </div>
 </div>
 
@@ -1793,6 +1819,23 @@ if (!reduced) addEventListener('scroll', () => {
     } catch(e) { ok('Clinician Console (demo)', 'In the live platform this opens your visit queue, navigation and documentation tools.'); }
   });
   paintNav();
+
+  // --- registration nudge hooks (used by booking form, Dr. Sharen and the slide-in card) ---
+  window.samSignedIn = signedIn;
+  window.samSignup = (ctx, name, phone) => {
+    if (signedIn()) return;
+    resetPanes();
+    const ctxEl = document.getElementById('lp-context');
+    const msgs = {
+      booking: '✅ Request received! One last step — secure it under your free SAM Health ID, so your bookings, reports and visit notes stay in one file your clinician can open instantly.',
+      sharen: '💡 Save this conversation to your health file. Your free SAM Health ID keeps every report, question and visit note together — ready for any clinician.',
+      nudge: 'Takes 30 seconds — phone + OTP. One ID for your whole care story.'
+    };
+    if (ctxEl) { ctxEl.textContent = msgs[ctx] || msgs.nudge; ctxEl.style.display = 'block'; }
+    if (name && !document.getElementById('lp-name').value) document.getElementById('lp-name').value = name;
+    if (phone && !document.getElementById('lp-phone').value) document.getElementById('lp-phone').value = phone;
+    M.classList.add('open');
+  };
 })();
 
 // booking form (prototype)
@@ -1814,6 +1857,8 @@ document.getElementById('bookForm').addEventListener('submit', e => {
   document.getElementById('formOk').style.display = 'flex';
   f.querySelector('button').disabled = true;
   f.querySelector('button').textContent = 'Request sent ✓';
+  // nudge: secure this booking under a SAM Health ID (prefilled — 1 OTP away)
+  if (!window.samSignedIn || !window.samSignedIn()) setTimeout(() => window.samSignup && window.samSignup('booking', payload.name, payload.phone), 1400);
 });
 document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.addEventListener('input', () => i.style.borderColor = ''));
 
@@ -1888,6 +1933,11 @@ document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.ad
     ty.remove();
     bubble('bot', r.reply + (r.action && actions[r.action] ? actions[r.action] : '') +
       (r.cites && r.cites.length ? '<div class="cite"><b>Why I say this</b> · ' + r.cites.map(esc).join(' · ') + '</div>' : ''));
+    // nudge: save this conversation to your health file
+    if ((!window.samSignedIn || !window.samSignedIn()) && !thread.querySelector('.signup-chip')) {
+      const chip = bubble('bot signup-chip', '💾 <b>Save this to your health file</b> — create your free SAM Health ID (30 sec, phone + OTP) and every answer, report and booking stays under one ID. <b>Tap to create →</b>');
+      chip.addEventListener('click', () => window.samSignup && window.samSignup('sharen'));
+    }
     busy = false; input.focus();
   };
   send.addEventListener('click', ask);
@@ -1935,7 +1985,26 @@ document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.ad
     const text = 'Hi SAM 👋 I’m ' + name + (area ? ', from ' + area : '') + '. [' + t + '] ' + (msg || 'I’d like to know more.') + ' (via samhealthcare website)';
     window.open('https://wa.me/917207426888?text=' + encodeURIComponent(text), '_blank', 'noopener');
     W.classList.remove('open'); step(1);
+    if (!window.samSignedIn || !window.samSignedIn()) setTimeout(() => window.samSignup && window.samSignup('nudge', name), 1200);
   });
+})();
+
+// ===== persistent SAM ID nudge (until they register) =====
+(() => {
+  const N = document.getElementById('idNudge');
+  if (!N) return;
+  const signed = () => window.samSignedIn && window.samSignedIn();
+  const snoozed = () => sessionStorage.getItem('sam_nudge_later') === '1';
+  let shown = false;
+  const show = () => { if (shown || signed() || snoozed()) return; shown = true; N.classList.add('show'); };
+  const hide = snooze => { N.classList.remove('show'); shown = true; if (snooze) sessionStorage.setItem('sam_nudge_later', '1'); };
+  setTimeout(show, 22000); // after 22s on page
+  let fired = false;
+  addEventListener('scroll', () => { if (fired) return;
+    if (scrollY > document.body.scrollHeight * 0.45) { fired = true; show(); } }, { passive: true });
+  document.getElementById('nudgeGo').addEventListener('click', () => { hide(false); window.samSignup && window.samSignup('nudge'); });
+  document.getElementById('nudgeLater').addEventListener('click', () => hide(true));
+  document.getElementById('nudgeX').addEventListener('click', () => hide(true));
 })();
 </script>
 </body>
