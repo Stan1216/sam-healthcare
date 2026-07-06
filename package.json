@@ -1,0 +1,13 @@
+{
+  "name": "sam-healthcare-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SAM Healthcare website + backend (patient OTP login, clinician login, booking capture)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  }
+}

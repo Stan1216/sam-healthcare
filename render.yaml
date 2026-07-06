@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: sam-healthcare
+    runtime: node
+    plan: free
+    buildCommand: ""
+    startCommand: node server.js
+    envVars:
+      - key: SAM_SECRET
+        generateValue: true
+      - key: NODE_VERSION
+        value: 22.18.0
+      # Dr. Sharen LLM brain — Render will ask you for this value at deploy time.
+      # Get the key: console.anthropic.com → API Keys → Create Key (starts sk-ant-…)
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SHAREN_MODEL
+        value: claude-haiku-4-5-20251001
