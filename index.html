@@ -1874,7 +1874,7 @@ document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.ad
     const t = q.toLowerCase();
     const A = (reply, cites, action) => ({ reply, cites: cites || [], action: action || null });
     if (/(chest pain|unconscious|not breathing|breathless|severe bleeding|stroke|seizure|suicide|overdose|heart attack|electric shock|drown|choking)/.test(t))
-      return A('This sounds like it could be an emergency. Please call <b>108</b> (ambulance) right now — do not wait for a home visit. Once emergency care is underway, our care team can help coordinate hospital handoff and follow-up at home.', ['Emergency routing per SAM safety charter — Dr. Sharen never gates emergencies'], 'emergency');
+      return A('This could be an emergency — get emergency care <b>NOW</b>: call <b>108</b>, or if it\'s delayed in your area, take a private ambulance or go straight to the nearest hospital emergency room. And call SAM in parallel on <b>+91 72074 26888</b> — our care desk will coordinate the ambulance and hospital admission through our partner network, keep your family informed, and arrange recovery care at home afterwards. We stay with you through all of it.', ['Emergency routing per SAM safety charter — emergency services first, SAM coordinates alongside'], 'emergency');
     if (/(dose|dosage|prescri|which medicine|what medicine|drug for|antibiotic|painkiller|increase my|reduce my|stop taking)/.test(t))
       return A("I can't recommend medicines or doses — that requires a licensed clinician who knows the full history. What I can do: explain what a prescribed medicine is for, flag interactions to discuss, and arrange a clinician callback within the hour.", ['SAM prohibited-outputs policy: no diagnosis, no prescription, no dose changes without clinician sign-off'], 'callback');
     if (/(platelet|dengue|malaria|typhoid|fever)/.test(t))
@@ -1915,7 +1915,7 @@ document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.ad
     callback: '<span class="step"><a href="#book" style="color:inherit">Request a care-team callback →</a></span>',
     pricing: '<span class="step"><a href="#pricing" style="color:inherit">See the published rate card →</a></span>',
     services: '<span class="step"><a href="#services" style="color:inherit">See what\'s live today →</a></span>',
-    emergency: '<span class="step" style="color:#B23B2E">Call 108 now — then we can help with follow-up at home.</span>'
+    emergency: '<span class="step" style="color:#B23B2E">Get emergency care now (108 / nearest ER) — and call us in parallel: <a href="tel:+917207426888" style="color:inherit">+91 72074 26888</a>. We coordinate and stay with your family.</span>'
   };
 
   let busy = false;
