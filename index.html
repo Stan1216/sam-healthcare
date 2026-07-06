@@ -1729,12 +1729,16 @@ if (!reduced) addEventListener('scroll', () => {
   map.forEach((a, id) => { const s = document.getElementById(id); if (s) spy.observe(s); });
 })();
 
+// ===== API base: same-origin on Render/local; Render backend when served from Hostinger/custom domain =====
+const SAM_API = (location.protocol === 'file:' || location.hostname === 'localhost' || location.hostname.endsWith('.onrender.com'))
+  ? '' : 'https://sam-healthcare.onrender.com';
+
 // login modal + account (demo mode + real API when served by Platform Starter)
 (() => {
   const M = document.getElementById('loginModal');
   const loginBtn = document.getElementById('loginBtn');
-  const api = (p, body) => fetch(p, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)}).then(r => r.json());
-  const get = (p) => fetch(p, {headers: {'Authorization': 'Bearer ' + (localStorage.getItem('sam_token')||'')}}).then(r => r.json());
+  const api = (p, body) => fetch(SAM_API + p, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)}).then(r => r.json());
+  const get = (p) => fetch(SAM_API + p, {headers: {'Authorization': 'Bearer ' + (localStorage.getItem('sam_token')||'')}}).then(r => r.json());
   const signedIn = () => !!localStorage.getItem('sam_token') || !!localStorage.getItem('sam_demo');
   const displayName = () => localStorage.getItem('sam_name') || 'My SAM';
 
@@ -1849,7 +1853,7 @@ document.getElementById('bookForm').addEventListener('submit', e => {
     service: f.querySelector('#f-svc').value, area: f.querySelector('#f-area').value };
   const hdrs = {'Content-Type':'application/json'};
   if (localStorage.getItem('sam_token')) hdrs['Authorization'] = 'Bearer ' + localStorage.getItem('sam_token');
-  fetch('/api/bookings', {method:'POST', headers:hdrs, body: JSON.stringify(payload)}).catch(() => {
+  fetch(SAM_API + '/api/bookings', {method:'POST', headers:hdrs, body: JSON.stringify(payload)}).catch(() => {
     const demo = JSON.parse(localStorage.getItem('sam_demo_bookings') || '[]');
     demo.unshift({ service: payload.service, area: payload.area, status: 'new', created_at: new Date().toLocaleString('en-IN') });
     localStorage.setItem('sam_demo_bookings', JSON.stringify(demo.slice(0, 20)));
@@ -1926,7 +1930,7 @@ document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.ad
     bubble('user', esc(q));
     const ty = bubble('bot typing', '<i></i><i></i><i></i>');
     let r;
-    try { const res = await fetch('/api/sharen', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ q }) });
+    try { const res = await fetch(SAM_API + '/api/sharen', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ q }) });
       if (!res.ok) throw 0; r = await res.json(); r.reply = esc(r.reply);
     } catch(e) { r = local(q); }
     await new Promise(w => setTimeout(w, 600));
@@ -1981,7 +1985,7 @@ document.querySelectorAll('#bookForm input, #bookForm select').forEach(i => i.ad
     const msg = document.getElementById('wawMsg').value.trim();
     const t = topic || 'General enquiry';
     // log the lead (backend if present, ignore failures) — so no enquiry is lost
-    fetch('/api/inquiries', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name: name + (area ? ' (' + area + ')' : ''), topic: t, message: msg }) }).catch(() => {});
+    fetch(SAM_API + '/api/inquiries', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name: name + (area ? ' (' + area + ')' : ''), topic: t, message: msg }) }).catch(() => {});
     const text = 'Hi SAM 👋 I’m ' + name + (area ? ', from ' + area : '') + '. [' + t + '] ' + (msg || 'I’d like to know more.') + ' (via samhealthcare website)';
     window.open('https://wa.me/917207426888?text=' + encodeURIComponent(text), '_blank', 'noopener');
     W.classList.remove('open'); step(1);

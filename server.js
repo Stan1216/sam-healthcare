@@ -175,9 +175,25 @@ async function askClaude(userText, extraContext) {
   } catch (e) { return null; }
 }
 
+// ---------- CORS (front end on Hostinger/custom domain, API here) ----------
+const CORS_ORIGINS = (process.env.SAM_CORS ||
+  "https://www.samhealthcare.in,https://samhealthcare.in,https://www.samhealthcare.co.in,https://samhealthcare.co.in")
+  .split(",").map(s => s.trim()).filter(Boolean);
+
 // ---------- server ----------
 http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://x");
+
+  // CORS: allow the SAM front-end domains to call this API
+  const origin = req.headers.origin;
+  if (origin && CORS_ORIGINS.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Max-Age", "86400");
+  }
+  if (req.method === "OPTIONS") { res.writeHead(204); return res.end(); }
 
   // --- API ---
   if (url.pathname === "/api/otp/request" && req.method === "POST") {
