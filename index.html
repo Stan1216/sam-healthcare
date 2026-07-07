@@ -64,14 +64,14 @@ header.scrolled{box-shadow:0 6px 24px rgba(0,64,80,.08)}
 .logo img{height:54px;width:auto;display:block;transition:transform .3s}
 .logo:hover img{transform:scale(1.04)}
 .logo-foot img{height:88px;width:auto;display:block}
-.nav-links{display:flex;gap:30px;font-size:15px;font-weight:600}
-.nav-links a{position:relative;color:var(--ink)}
+.nav-links{display:flex;gap:17px;font-size:13.5px;font-weight:600;white-space:nowrap;align-items:center}
+.nav-links a{position:relative;color:var(--ink);white-space:nowrap}
 .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;height:2.5px;width:0;background:var(--grad);border-radius:2px;transition:width .3s}
 .nav-links a:hover::after{width:100%}
 .nav-cta{display:flex;align-items:center;gap:16px}
 .nav-phone{font-weight:800;color:var(--teal);font-size:15px}
 .nav .btn{padding:12px 24px;font-size:14.5px}
-@media(max-width:960px){.nav-links{display:none}.nav-phone{display:none}}
+@media(max-width:1300px){.nav-phone{display:none}}@media(max-width:1050px){.nav-links{display:none}}
 /* ===== hero ===== */
 .hero{min-height:100svh;display:flex;align-items:center;padding:140px 0 40px;overflow:hidden}
 .blob{position:absolute;border-radius:46% 54% 60% 40%/50% 45% 55% 50%;filter:blur(70px);opacity:.5;z-index:-1;animation:morph 16s ease-in-out infinite alternate}
@@ -733,7 +733,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,su
     <div class="reveal">
       <span class="eyebrow">Now serving Hyderabad · Jubilee Hills · Banjara Hills · Madhapur · Gachibowli · Kokapet</span>
       <p class="hero-kicker">Your father's fever won't break. The clinic has closed. And the hardest journey in the world is the one between your home and a hospital.</p>
-      <h1>So we bring the hospital<br>to your <span class="grad-text">doorstep.</span></h1>
+      <h1>So we bring the hospital <br>to your <span class="grad-text">doorstep.</span></h1>
       <p class="lead">No queues under tube lights. No waiting rooms full of strangers. Call us, and within 60 minutes a verified clinician has heard your story and your care plan is moving — physiotherapy at your door today, and behind it, everything a hospital can safely bring home: nursing, diagnostics, medicines, equipment, opening wing by wing. With one Family Care Manager who knows your family's story, and prices we publish like a promise.</p>
       <div class="badge-row">
         <span class="badge">✓ MBBS-verified doctors</span>
