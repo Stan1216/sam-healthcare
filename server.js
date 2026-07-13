@@ -16,6 +16,8 @@ const Database = require("better-sqlite3"); // portable native SQLite — runs o
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.SAM_SECRET || "dev-secret-change-me";
 const SITE = process.env.SITE_FILE || path.join(__dirname, "index.html");
+const SHAREN_PAGE = process.env.SHAREN_FILE || path.join(__dirname, "sharen.html"); // standalone shareable Dr. Sharen tester
+const SHAREN_KEY = process.env.SHAREN_KEY || "SAM26trust"; // private-link key — /sharen only opens with ?k=<this>; rotate anytime via env
 
 // ---------- database ----------
 const DB_FILE = process.env.SAM_DB || path.join(__dirname, "sam.db"); // override to relocate the database (e.g. a mounted persistent disk)
@@ -451,6 +453,18 @@ const requestHandler = async (req, res) => {
       }
     } catch (e) { console.log("[WA WEBHOOK]", e.message); }
     return json(res, 200, { received: true });
+  }
+
+  // --- standalone Dr. Sharen page (PRIVATE tester link: /sharen?k=<key>) ---
+  if (url.pathname === "/sharen" || url.pathname === "/sharen/" || url.pathname === "/drsharen") {
+    if ((url.searchParams.get("k") || "") !== SHAREN_KEY) {
+      res.writeHead(302, { Location: "/" }); return res.end(); // no key → quietly back to homepage
+    }
+    if (fs.existsSync(SHAREN_PAGE)) {
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "X-Robots-Tag": "noindex, nofollow" });
+      return fs.createReadStream(SHAREN_PAGE).pipe(res);
+    }
+    res.writeHead(302, { Location: "/#aiChat" }); return res.end(); // graceful fallback to on-site chat
   }
 
   // --- website ---

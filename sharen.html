@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ask Dr. Sharen — SAM Healthcare</title>
+<meta name="description" content="Talk to Dr. Sharen, SAM Healthcare's clinical AI. It listens first, asks before it answers, cites its sources — and never prescribes.">
+<meta name="robots" content="noindex,nofollow">
+<meta property="og:title" content="Ask Dr. Sharen — SAM Healthcare">
+<meta property="og:description" content="A clinical AI that listens first and never sells. Try it — describe any health concern in your own words.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://samhealthcare.in/sharen">
+<meta name="theme-color" content="#00303C">
+<style>
+:root{
+  --teal:#004050;--teal-deep:#00303C;--ink:#0F2A30;
+  --grad:linear-gradient(120deg,#38A8D8 0%,#78C088 50%,#B8D838 100%);
+  --mint:#7CFAD4;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#EAF6F4;
+  background:radial-gradient(900px 540px at 8% -6%,#0B4A54 0%,transparent 55%),
+             radial-gradient(700px 460px at 100% 4%,#123B57 0%,transparent 50%),
+             linear-gradient(168deg,#00303C 0%,#0F2A30 60%,#0A2A36 100%);
+  background-attachment:fixed;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+.top{display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;
+  border-bottom:1px solid rgba(255,255,255,.09);background:rgba(0,32,42,.55);backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}
+.mark{width:34px;height:34px;border-radius:10px;background:#004050;display:grid;place-items:center;flex:none}
+.mark svg{width:20px;height:20px}
+.brand{font-weight:800;font-size:15px;letter-spacing:.01em}
+.brand small{display:block;font-weight:600;font-size:11px;color:#8FB6B0;letter-spacing:.02em}
+.site{margin-left:auto;font-size:12.5px;font-weight:700;color:#9FD8CB;text-decoration:none;border:1px solid rgba(159,216,203,.3);
+  padding:7px 13px;border-radius:999px;white-space:nowrap}
+.hero{padding:26px 20px 8px;text-align:center}
+.ava{position:relative;width:64px;height:64px;margin:0 auto 12px;border-radius:50%;background:var(--grad);display:grid;place-items:center}
+.ava svg{width:36px;height:36px}
+.ava::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(124,250,212,.35);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(124,250,212,.35)}70%{box-shadow:0 0 0 12px rgba(124,250,212,0)}100%{box-shadow:0 0 0 0 rgba(124,250,212,0)}}
+.hero h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+.hero .on{display:inline-flex;align-items:center;gap:7px;margin-top:7px;font-size:12.5px;font-weight:700;color:#8FD9C6}
+.hero .on i{width:7px;height:7px;border-radius:50%;background:#4ADE80;display:inline-block}
+.hero p{margin-top:10px;font-size:14px;line-height:1.6;color:#AFCDC8;max-width:430px;margin-left:auto;margin-right:auto}
+.chat{flex:1;display:flex;flex-direction:column;max-width:680px;width:100%;margin:0 auto;padding:14px 14px 0}
+.thread{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:11px;padding:10px 4px 16px;scrollbar-width:thin}
+.msg{max-width:86%;padding:12px 16px;border-radius:17px;font-size:15px;line-height:1.55;word-wrap:break-word;animation:pop .4s cubic-bezier(.22,.8,.24,1)}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.bot{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.10);border-bottom-left-radius:6px;align-self:flex-start}
+.user{background:var(--grad);color:#06282E;font-weight:600;border-bottom-right-radius:6px;align-self:flex-end}
+.cites{font-size:11.5px;color:#8FB6B0;margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,.10)}
+.typing{display:inline-flex;gap:5px;padding:14px 17px}
+.typing i{width:7px;height:7px;border-radius:50%;background:#9FD8CB;animation:ty 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes ty{0%,60%,100%{transform:none;opacity:.45}30%{transform:translateY(-5px);opacity:1}}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 4px 12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;font-size:13px;font-weight:700;color:#CFEDE4;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;padding:9px 15px;cursor:pointer}
+.chip:active{background:rgba(255,255,255,.15)}
+.askbar{position:sticky;bottom:0;background:linear-gradient(180deg,transparent,rgba(6,36,44,.92) 30%);padding:8px 4px calc(12px + env(safe-area-inset-bottom))}
+.ask{display:flex;gap:10px}
+.ask textarea{flex:1;resize:none;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.17);border-radius:24px;color:#fff;
+  padding:14px 20px;font-size:15.5px;font-family:inherit;outline:none;max-height:120px;line-height:1.4}
+.ask textarea::placeholder{color:#7FA8A2}
+.ask textarea:focus{border-color:rgba(124,250,212,.5)}
+.ask button{background:var(--grad);border:0;border-radius:50%;width:50px;height:50px;display:grid;place-items:center;cursor:pointer;flex:none;align-self:flex-end}
+.ask button:disabled{opacity:.5}
+.rails{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:10px 14px 4px}
+.rail{font-size:10.5px;font-weight:700;color:#96C3B9;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:5px 11px;white-space:nowrap}
+.foot{text-align:center;font-size:11px;color:#6E938E;padding:8px 20px calc(10px + env(safe-area-inset-bottom));line-height:1.5}
+.foot a{color:#9FD8CB;text-decoration:none;font-weight:700}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="mark">
+    <svg viewBox="0 0 40 40" fill="none"><path d="M20 8v24M8 20h24" stroke="url(#g1)" stroke-width="6" stroke-linecap="round"/><defs><linearGradient id="g1" x1="8" y1="8" x2="32" y2="32"><stop stop-color="#38A8D8"/><stop offset=".5" stop-color="#78C088"/><stop offset="1" stop-color="#B8D838"/></linearGradient></defs></svg>
+  </div>
+  <div class="brand">SAM Healthcare<small>Hyderabad · care at home</small></div>
+  <a class="site" href="https://samhealthcare.in/">Visit site →</a>
+</header>
+
+<div class="hero">
+  <div class="ava">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 3c3.9 0 7 3.1 7 7v3.5c0 2.5-1.6 4.7-3.9 5.5l-.6 1.7c-.2.5-.8.8-1.3.6l-2.4-.9c-3.4-.5-5.8-3.4-5.8-6.9V10c0-3.9 3.1-7 7-7z" fill="#06282E"/><circle cx="9.5" cy="11" r="1.2" fill="#7CFAD4"/><circle cx="14.5" cy="11" r="1.2" fill="#7CFAD4"/><path d="M9.5 14.6c.8.7 1.7 1 2.5 1s1.7-.3 2.5-1" stroke="#7CFAD4" stroke-width="1.3" stroke-linecap="round"/></svg>
+  </div>
+  <h1>Ask Dr. Sharen</h1>
+  <div class="on"><i></i> Online now · free to use</div>
+  <p>SAM Healthcare's clinical AI. It listens first, asks before it answers, and tells you honestly when a real clinician is the right next step.</p>
+</div>
+
+<main class="chat">
+  <div class="thread" id="thread" aria-live="polite"></div>
+  <div class="chips" id="chips">
+    <button class="chip">Fever for two days</button>
+    <button class="chip">My father is dizzy when standing</button>
+    <button class="chip">Knee pain climbing stairs</button>
+    <button class="chip">Post-surgery physio at home?</button>
+    <button class="chip">Mother needs a nurse at home</button>
+  </div>
+  <div class="askbar">
+    <div class="ask">
+      <textarea id="q" rows="1" placeholder="Describe what's going on…" autocomplete="off"></textarea>
+      <button id="send" aria-label="Send">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 12h14M13 6l6 6-6 6" stroke="#06282E" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</main>
+
+<div class="rails">
+  <span class="rail">🚨 Emergencies → call 108 first</span>
+  <span class="rail">Rx never prescribes medicines</span>
+  <span class="rail">📚 cites recognised sources</span>
+</div>
+<p class="foot">Dr. Sharen is an assistant, not a doctor — it never diagnoses or prescribes. For emergencies call <b>108</b> immediately.
+  Care desk: <a href="tel:+917207426888">+91 72074 26888</a> · <a href="https://samhealthcare.in/">samhealthcare.in</a></p>
+
+<script>
+(function(){
+  var thread=document.getElementById('thread'),q=document.getElementById('q'),
+      send=document.getElementById('send'),chips=document.getElementById('chips'),busy=false;
+
+  function bubble(html,who){var d=document.createElement('div');d.className='msg '+who;d.innerHTML=html;
+    thread.appendChild(d);thread.scrollTop=thread.scrollHeight;return d}
+  function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+  function typing(){var d=document.createElement('div');d.className='msg bot typing';d.innerHTML='<i></i><i></i><i></i>';
+    thread.appendChild(d);thread.scrollTop=thread.scrollHeight;return d}
+
+  /* greeting — same warm open as the main site */
+  setTimeout(function(){bubble("Hi, I'm Dr. Sharen 👋 I'm here to help, not to sell you anything. What's going on with you or your family today?","bot")},700);
+
+  function history(){
+    return Array.prototype.slice.call(thread.querySelectorAll('.msg')).filter(function(b){return !b.classList.contains('typing')})
+      .slice(-8).map(function(b){return {role:b.classList.contains('user')?'user':'bot',text:(b.innerText||'').slice(0,1500)}});
+  }
+
+  function ask(text){
+    text=(text||'').trim(); if(!text||busy) return;
+    busy=true; send.disabled=true;
+    var h=history();               /* capture BEFORE adding the new user bubble */
+    bubble(esc(text),'user'); q.value=''; q.style.height='auto'; chips.style.display='none';
+    var t=typing();
+    fetch('/api/sharen',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({q:text,history:h})})
+      .then(function(r){return r.json()})
+      .then(function(d){
+        t.remove();
+        var html=esc(d.reply||"Sorry — I didn't catch that. Could you say it again?").replace(/\n/g,'<br>');
+        if(d.cites&&d.cites.length) html+='<div class="cites">Sources: '+d.cites.map(esc).join(' · ')+'</div>';
+        bubble(html,'bot');
+      })
+      .catch(function(){
+        t.remove();
+        bubble("I'm having trouble connecting right now. Please try again in a moment — or call our care desk on <b>+91 72074 26888</b>.",'bot');
+      })
+      .finally(function(){busy=false;send.disabled=false;q.focus()});
+  }
+
+  send.addEventListener('click',function(){ask(q.value)});
+  q.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();ask(q.value)}});
+  q.addEventListener('input',function(){q.style.height='auto';q.style.height=Math.min(q.scrollHeight,120)+'px'});
+  chips.addEventListener('click',function(e){if(e.target.classList.contains('chip'))ask(e.target.textContent)});
+})();
+</script>
+</body>
+</html>
