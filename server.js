@@ -169,7 +169,12 @@ async function askClaude(userText, extraContext, history) {
     const raw = [];
     if (Array.isArray(history)) for (const h of history.slice(-8)) {
       if (!h || !h.text) continue;
-      raw.push({ role: (h.role === "bot" || h.role === "assistant") ? "assistant" : "user", content: String(h.text).slice(0, 1500) });
+      const isBot = (h.role === "bot" || h.role === "assistant");
+      // Assistant turns are replayed in the SAME JSON shape the model must output — otherwise it
+      // mimics the prose history, drops the JSON format on follow-ups, and the parser falls back to script.
+      const content = isBot ? JSON.stringify({ reply: String(h.text).slice(0, 1200), cites: [], action: null })
+                            : String(h.text).slice(0, 1500);
+      raw.push({ role: isBot ? "assistant" : "user", content });
     }
     while (raw.length && raw[0].role !== "user") raw.shift();            // Anthropic requires the first turn to be the user's
     raw.push({ role: "user", content: (extraContext ? extraContext + "\n\n" : "") + userText });
@@ -186,9 +191,14 @@ async function askClaude(userText, extraContext, history) {
     const d = await r.json();
     const txt = d?.content?.[0]?.text || "";
     const m = txt.match(/\{[\s\S]*\}/);
-    if (!m) return null;
-    const out = JSON.parse(m[0]);
-    if (!out.reply) return null;
+    let out = null;
+    if (m) { try { out = JSON.parse(m[0]); } catch (e) { out = null; } }
+    // Tolerant fallback: if the model answered in plain prose (no/bad JSON), use the prose itself
+    // rather than dropping to the canned script — a real reply beats a scripted one.
+    if (!out || !out.reply) {
+      const plain = txt.replace(/```[a-z]*|```/gi, "").trim();
+      if (plain.length > 4) out = { reply: plain, cites: [], action: null }; else return null;
+    }
     return { reply: String(out.reply).slice(0, 900), cites: Array.isArray(out.cites) ? out.cites.slice(0, 3).map(String) : [], action: ["book_physio","callback","pricing","services","emergency"].includes(out.action) ? out.action : null };
   } catch (e) { return null; }
 }
